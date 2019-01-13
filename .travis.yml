@@ -1,0 +1,19 @@
+language: cpp
+matrix:
+  include:
+  - os: linux
+    sudo: required
+script:
+- bash -c build.sh
+deploy:
+  provider: releases
+  file:
+  - wg
+  - wireguard.ko
+  target_commitish: "$TRAVIS_COMMIT"
+  tag_name: "$TRAVIS_TAG"
+  api_key:
+    secure: octpImef1F+G3mw+aOvtNz6Nn6/gWKy2/Tg7M9Ffxq8uqXf4Dc0fgJ2jSvK3UWKIUVsNdJxH0mB2ZhHUWw5ZZkjFc+VYGVjh11//R6L03/o4eLZy9aLVaekxnWGWjrgNy0q6pHDvtAAkfWEX5czBQR1Tou0LGc6uMsTck4T9bwlvRw1cKMYTCvAQ4mdgObaIvzw2w2GEihVXxTOivnWNtXb2knBG01uMKAUma/RMF3aT2WpsJN1P+ibrfOIquTII9t8uwzhSORhQrv6ouO8mhGekPirpcU6+ak685E0Dj48G0o2auh5luOI/e4miv7Jwlz1dbOJ0QD0iIPcJoYaG7H3oD1+qCU1gTwAw60d682n5nSMZDEfHkpL4OqwrxBld0GHGy+plQq3vEs4bFRVwWhtsBXxXieN3DQ+6u9BLrtIiuTHpRJUk7xUSYf2kV1yLW8/+qZa2z4+3FHi4wE9G28nxk1W+VQ8CGk7gR4VPWUagBSiZKLY4c2rpIukPFphnKJU3eMmrpEpYrJu0RwE80qbTjDay3rmozFt0yfzAuODDEchQnicZueeGmhuFbDlsVMDx+TRGxjawGOwOcC/Sb5t6A9QMbrsT5YmyTGfna9Z1t9sZhAQzgMCkEPAXFPjD3RRAL9+ryddv14WKq+mwu232uXU897w+WH4ozSWHn8U=
+  skip_cleanup: true
+  on:
+    tags: true
