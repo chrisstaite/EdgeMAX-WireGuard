@@ -4,7 +4,7 @@ matrix:
   - os: linux
     sudo: required
 script:
-- bash -c build.sh
+- bash -c $TRAVIS_BUILD_DIR/build.sh
 deploy:
   provider: releases
   file:
