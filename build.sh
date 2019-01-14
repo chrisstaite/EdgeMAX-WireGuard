@@ -44,13 +44,13 @@ sudo chroot ${CHROOT_DIR} apt-get --allow-unauthenticated install \
     -qq -y ${GUEST_DEPENDENCIES}
 
 # Get the sources to build
-wget -qO- $ROUTER_SOURCES | tar -C $CHROOT_DIR -xj
-tar -C $CHROOT_DIR/usr/src -xzf $CHROOT_DIR/source/kernel_*
-git clone $WIREGUARD_REPO $CHROOT_DIR/WireGuard
+wget -qO- $ROUTER_SOURCES | sudo tar -C $CHROOT_DIR -xj
+sudo tar -C $CHROOT_DIR/usr/src -xzf $CHROOT_DIR/source/kernel_*
+sudo git clone $WIREGUARD_REPO $CHROOT_DIR/WireGuard
 
 # Get the Cavium SDK
-wget -qO- https://github.com/Cavium-Open-Source-Distributions/OCTEON-SDK/blob/master/toolchain-build-54.tbz?raw=true | tar -xj -C $CHROOT_DIR/usr/src
-patch -p0 -d $CHROOT_DIR/usr/src/toolchain/gits/gcc << EOF
+wget -qO- https://github.com/Cavium-Open-Source-Distributions/OCTEON-SDK/blob/master/toolchain-build-54.tbz?raw=true | sudo tar -xj -C $CHROOT_DIR/usr/src
+sudo patch -p0 -d $CHROOT_DIR/usr/src/toolchain/gits/gcc << EOF
 --- ./gcc/doc/gcc.texi 2017-03-01 16:56:48.000000000 -0800
 +++ ./gcc/doc/gcc.texi 2017-03-01 17:03:38.000000000 -0800
 @@ -86,9 +86,15 @@
@@ -81,15 +81,15 @@ patch -p0 -d $CHROOT_DIR/usr/src/toolchain/gits/gcc << EOF
  @page
 EOF
 # Build the toolchain - this fails, but builds GCC before it does, so it'll do
-make -C $CHROOT_DIR/usr/src/toolchain RELEASE=1 linux || true
+sudo make -C $CHROOT_DIR/usr/src/toolchain RELEASE=1 linux || true
 
 # Sort out the kernel config
 VERSION=$( echo "$ROUTER_SOURCES" | grep -o 'ER-e[0-9]\{2,4\}' )
-cp $CHROOT_DIR/usr/src/kernel/ubnt-config/$VERSION.config $CHROOT_DIR/usr/src/kernel/.config
-PATH=$PATH:$CHROOT_DIR/usr/src/toolchain/minimal-mips64-octeon-linux-gnu/bin make -C $CHROOT_DIR/usr/src/kernel ARCH=$CHROOT_ARCH prepare scripts
+sudo cp $CHROOT_DIR/usr/src/kernel/ubnt-config/$VERSION.config $CHROOT_DIR/usr/src/kernel/.config
+PATH=$PATH:$CHROOT_DIR/usr/src/toolchain/minimal-mips64-octeon-linux-gnu/bin sudo make -C $CHROOT_DIR/usr/src/kernel ARCH=$CHROOT_ARCH prepare scripts
 
 # Build the kernel module
-PATH=$PATH:$CHROOT_DIR/usr/src/toolchain/minimal-mips64-octeon-linux-gnu/bin make -C $CHROOT_DIR/WireGuard/src ARCH=$CHROOT_ARCH KENELDIR=$CHROOT_DIR/usr/src/kernel module
+PATH=$PATH:$CHROOT_DIR/usr/src/toolchain/minimal-mips64-octeon-linux-gnu/bin sudo make -C $CHROOT_DIR/WireGuard/src ARCH=$CHROOT_ARCH KENELDIR=$CHROOT_DIR/usr/src/kernel module
 
 # Build the wg utility
 sudo chroot ${CHROOT_DIR} bash -c "make -C WireGuard/src tools"
